@@ -1,0 +1,11 @@
+*~
+*.pyc
+*.pyo
+*.so
+*.c
+#*#
+/*.egg-info
+/build
+/dist
+/MANIFEST
+/COPYING
