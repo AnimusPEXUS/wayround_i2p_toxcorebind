@@ -4,7 +4,11 @@ cimport wayround_org.toxcorebind.tox_h
 # from wayround_org.toxcorebind.wayround_org.toxcorebind.tox_h cimport *
 
 cimport libc.stdlib
+cimport libc.stdio
+cimport libc.string
+
 from libc.stdint cimport *
+
 
 import builtins
 
@@ -222,7 +226,7 @@ class Tox_Options:
         ret = t.savedata_data[0:self.savedata_length]
         return ret
 
-    @property.setter
+    @savedata_data.setter
     def savedata_data(self, value):
         if not isinstance(value, bytes):
             raise TypeError("bytes expected")
@@ -243,8 +247,8 @@ def tox_options_new():
     cdef wayround_org.toxcorebind.tox_h.TOX_ERR_OPTIONS_NEW error
     cdef wayround_org.toxcorebind.tox_h.Tox_Options * res
     res = wayround_org.toxcorebind.tox_h.tox_options_new(& error)
-    ret = Tox_Options(< int > <void*> res)
     if error == 0:
+        ret = Tox_Options(< uintptr_t > res)
         ret.reset_defaults()
         ret._ok = True
     else:
@@ -303,7 +307,17 @@ class Tox:
         if not isinstance(public_key, bytes):
             raise TypeError("`public_key' must be bytes")
 
+        if len(public_key) != wayround_org.toxcorebind.tox_h.TOX_PUBLIC_KEY_SIZE:
+            raise ValueError("`public_key' invalid format")
+
         cdef wayround_org.toxcorebind.tox_h.TOX_ERR_BOOTSTRAP error
+
+        # libc.stdio.printf(
+        #    "address: %s, strlen: %d\n",
+        #    < char * > address,
+        #    libc.string.strlen(< char * > address)
+        #    )
+        #print("address ({}): {}".format())
 
         ret = wayround_org.toxcorebind.tox_h.tox_bootstrap(
             < wayround_org.toxcorebind.tox_h.Tox * >self._pointer,
@@ -312,6 +326,8 @@ class Tox:
             public_key,
             & error
             )
+
+        print('bootxstrap exit')
 
         return bool(ret), error
 
@@ -327,6 +343,9 @@ class Tox:
 
         if not isinstance(public_key, bytes):
             raise TypeError("`public_key' must be bytes")
+
+        if len(public_key) != wayround_org.toxcorebind.tox_h.TOX_PUBLIC_KEY_SIZE:
+            raise ValueError("`public_key' invalid format")
 
         cdef wayround_org.toxcorebind.tox_h.TOX_ERR_BOOTSTRAP error
 
@@ -446,7 +465,7 @@ class Tox:
         cdef wayround_org.toxcorebind.tox_h.TOX_ERR_SET_INFO error
 
         ret = wayround_org.toxcorebind.tox_h.tox_self_set_name(
-            < wayround_org.toxcorebind.tox_h.Tox * >self._pointer,
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             name,
             len(name),
             & error
@@ -456,7 +475,7 @@ class Tox:
 
     def self_get_name_size(self):
         ret = wayround_org.toxcorebind.tox_h.tox_self_get_name_size(
-            < wayround_org.toxcorebind.tox_h.Tox * >self._pointer
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer
             )
         return ret
 
@@ -469,7 +488,7 @@ class Tox:
         data = <uint8_t * >libc.stdlib.malloc(size)
 
         ret = wayround_org.toxcorebind.tox_h.tox_self_get_name(
-            < wayround_org.toxcorebind.tox_h.Tox * >self._pointer,
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             data
             )
 
@@ -490,11 +509,13 @@ cdef _tox_self_connection_status_callback(
     return ret
 
 
-def tox_new(options):
-    if not isinstance(options, Tox_Options):
-        raise TypeError("`options' unvalid type")
+def tox_new(options=None):
 
-    if not options._ok:
+    if options is not None and not isinstance(options, Tox_Options):
+        raise TypeError("`options' invalid type")
+
+    if (options is not None and
+            (not hasattr(options, '_ok') or not options._ok)):
         raise ValueError(
             "`options' value should have been created with "
             "tox_options_new()"
@@ -502,13 +523,20 @@ def tox_new(options):
 
     cdef wayround_org.toxcorebind.tox_h.TOX_ERR_NEW error
     cdef wayround_org.toxcorebind.tox_h.Tox * res
-    res = wayround_org.toxcorebind.tox_h.tox_new(
-        < wayround_org.toxcorebind.tox_h.Tox_Options * >options._pointer,
-        & error
-        )
-    ret = Tox(< int > <void*> res)
+
+    if options is not None:
+
+        res = wayround_org.toxcorebind.tox_h.tox_new(
+            < wayround_org.toxcorebind.tox_h.Tox_Options * >options._pointer,
+            & error
+            )
+
+    else:
+
+        res = wayround_org.toxcorebind.tox_h.tox_new(NULL, & error)
+
     if error == 0:
-        ret.reset_defaults()
+        ret = Tox(<uintptr_t> res)
         ret._ok = True
     else:
         ret = None
