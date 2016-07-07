@@ -1,23 +1,15 @@
 
 PYTHON=python3
 
-all: inits build_proc rminits
+all: build_proc
 
 
 build_proc:
+	touch wayround_org/__init__.py
 	make -C wayround_org/toxcorebind all
+	-rm wayround_org/__init__.py
 	$(PYTHON) ./setup.py build_ext --inplace
 
-clean: rminits clean2
-
-clean2:
+clean:
 	make -C wayround_org/toxcorebind clean
 
-
-inits:
-	# workaround for cython pep-420 incompatability
-	touch wayround_org/__init__.py
-
-rminits:
-	# removing workaround for cython pep-420 incompatability
-	-rm wayround_org/__init__.py
