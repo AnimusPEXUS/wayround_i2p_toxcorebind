@@ -99,7 +99,7 @@ class Tox_Options:
     @property
     def ipv6_enabled(self):
         ret = bool(
-            (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+            ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
             .ipv6_enabled
             )
         return ret
@@ -113,7 +113,7 @@ class Tox_Options:
     @property
     def udp_enabled(self):
         ret = bool(
-         (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+         ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
          .udp_enabled
          )
         return ret
@@ -225,7 +225,7 @@ class Tox_Options:
 
     @property
     def savedata_data(self):
-        t = (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+        t = ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
         ret = t.savedata_data[0:self.savedata_length]
         return ret
 
@@ -249,9 +249,9 @@ class Tox_Options:
 def tox_options_new():
     cdef wayround_org.toxcorebind.tox_h.TOX_ERR_OPTIONS_NEW error
     cdef wayround_org.toxcorebind.tox_h.Tox_Options * res
-    res = wayround_org.toxcorebind.tox_h.tox_options_new(& error)
+    res = wayround_org.toxcorebind.tox_h.tox_options_new( & error)
     if error == 0:
-        ret = Tox_Options(< uintptr_t > res)
+        ret = Tox_Options( < uintptr_t > res)
         ret.reset_defaults()
         ret._ok = True
     else:
@@ -296,6 +296,12 @@ class Tox:
         libc.stdlib.free(data)
 
         return ret
+
+    # /*************************************************************************
+    #  *
+    #  * :: Connection lifecycle and event loop
+    #  *
+    #  ************************************************************************/
 
     def bootstrap(
             self,
@@ -356,7 +362,7 @@ class Tox:
         wayround_org.toxcorebind.tox_h.tox_callback_self_connection_status(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             < wayround_org.toxcorebind.tox_h.tox_self_connection_status_cb * >
-            _tox_self_connection_status_callback,
+            _tox_self_connection_status_cb,
             < void * >o
             )
         return
@@ -372,6 +378,12 @@ class Tox:
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer
             )
         return
+
+    # /*************************************************************************
+    #  *
+    #  * :: Internal client information (Tox address/id)
+    #  *
+    #  ************************************************************************/
 
     def self_get_address(self):
 
@@ -447,6 +459,12 @@ class Tox:
         libc.stdlib.free(key)
 
         return ret
+
+    # /*************************************************************************
+    #  *
+    #  * :: User-visible client information (nickname/status)
+    #  *
+    #  ************************************************************************/
 
     def self_set_name(self, name):
 
@@ -699,7 +717,7 @@ class Tox:
 
     def friend_get_last_online(self, friend_number):
 
-        frient_number_check(friend_number)
+        friend_number_check(friend_number)
 
         cdef wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_GET_LAST_ONLINE error
 
@@ -744,7 +762,7 @@ class Tox:
 
         if error == wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_QUERY_OK:
 
-            _name = libc.stdlib.malloc(sizeof(uint8_t) * size)
+            _name = <uint8_t * >libc.stdlib.malloc(sizeof(uint8_t) * size)
 
             ret = wayround_org.toxcorebind.tox_h.tox_friend_get_name(
                 < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
@@ -753,8 +771,7 @@ class Tox:
                 & error
                 )
             if error == wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_QUERY_OK:
-
-            name = _name[:size]
+                name = _name[:size]
 
             libc.stdlib.free(_name)
 
@@ -769,7 +786,7 @@ class Tox:
             )
         return
 
-    def friend_get_status_message_size(self, friend_number)
+    def friend_get_status_message_size(self, friend_number):
 
         friend_number_check(friend_number)
 
@@ -796,7 +813,7 @@ class Tox:
 
         if error == wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_QUERY_OK:
 
-            _status_message = libc.stdlib.malloc(sizeof(uint8_t) * size)
+            _status_message = <uint8_t * >libc.stdlib.malloc(sizeof(uint8_t) * size)
 
             ret = wayround_org.toxcorebind.tox_h.tox_friend_get_status_message(
                 < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
@@ -805,8 +822,7 @@ class Tox:
                 & error
                 )
             if error == wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_QUERY_OK:
-
-            status_message = _status_message[:size]
+                status_message = _status_message[:size]
 
             libc.stdlib.free(_status_message)
 
@@ -825,9 +841,9 @@ class Tox:
 
         friend_number_check(friend_number)
 
-        cdef TOX_ERR_FRIEND_QUERY error
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_QUERY error
 
-        ret = tox_friend_get_status(
+        ret = wayround_org.toxcorebind.tox_h.tox_friend_get_status(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             friend_number,
             & error
@@ -839,7 +855,7 @@ class Tox:
         o = tuple(self, callback)
         wayround_org.toxcorebind.tox_h.tox_callback_friend_status(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
-            _tox_callback_friend_status,
+            _tox_friend_status_cb,
             < void * >o
             )
         return
@@ -848,9 +864,9 @@ class Tox:
 
         friend_number_check(friend_number)
 
-        cdef TOX_ERR_FRIEND_QUERY error
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_QUERY error
 
-        ret = tox_friend_get_connection_status(
+        ret = wayround_org.toxcorebind.tox_h.tox_friend_get_connection_status(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             friend_number,
             & error
@@ -871,9 +887,9 @@ class Tox:
 
         friend_number_check(friend_number)
 
-        cdef TOX_ERR_FRIEND_QUERY error
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_QUERY error
 
-        ret = tox_friend_get_typing(
+        ret = wayround_org.toxcorebind.tox_h.tox_friend_get_typing(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             friend_number,
             & error
@@ -903,9 +919,9 @@ class Tox:
         if not isinstance(typing, bool):
             raise TypeError("`typing' must be bool")
 
-        cdef TOX_ERR_SET_TYPING error
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_SET_TYPING error
 
-        ret = tox_self_set_typing(
+        ret = wayround_org.toxcorebind.tox_h.tox_self_set_typing(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             friend_number,
             typing,
@@ -920,10 +936,10 @@ class Tox:
         friend_message_check(message)
         message_type_check(message_type)
 
-        cdef TOX_ERR_FRIEND_SEND_MESSAGE error
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_SEND_MESSAGE error
 
-        ret = tox_friend_send_message(
-            Tox * tox,
+        ret = wayround_org.toxcorebind.tox_h.tox_friend_send_message(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             friend_number,
             message_type,
             message,
@@ -950,17 +966,27 @@ class Tox:
     #  *
     #  ************************************************************************/
 
-        void tox_callback_friend_request(
-            Tox * tox,
-            tox_friend_request_cb * callback,
-            void * user_data
+    def callback_friend_request(self, callback):
+
+        o = tuple(self, callback)
+        wayround_org.toxcorebind.tox_h.tox_callback_friend_request(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            _tox_friend_request_cb,
+            < void * >o
             )
 
-        void tox_callback_friend_message(
-            Tox * tox,
-            tox_friend_message_cb * callback,
-            void * user_data
+        return
+
+    def callback_friend_message(self, callback):
+
+        o = tuple(self, callback)
+        wayround_org.toxcorebind.tox_h.tox_callback_friend_message(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            _tox_friend_message_cb,
+            < void * >o
             )
+
+        return
 
     # /*************************************************************************
     #  *
@@ -968,83 +994,91 @@ class Tox:
     #  *
     #  ************************************************************************/
 
-        bool tox_hash(
-            uint8_t * hash,
-            uint8_t * data,
-            size_t length
+    def hash(self, data_in):
+        return tox_hash(data_in)
+
+    def file_control(self, friend_number, file_number, control):
+
+        friend_number_check(friend_number)
+
+        file_number_check(file_number)
+
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_FILE_CONTROL error
+
+        if not isinstance(control, int):
+            raise TypeError("`control' must be int")
+
+        ret = wayround_org.toxcorebind.tox_h.tox_file_control(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            friend_number,
+            file_number,
+            control,
+            & error
             )
 
-        ctypedef enum TOX_FILE_KIND:
-            TOX_FILE_KIND_DATA
-            TOX_FILE_KIND_AVATAR
+        return bool(ret), error
 
-        ctypedef enum TOX_FILE_CONTROL:
-            TOX_FILE_CONTROL_RESUME
-            TOX_FILE_CONTROL_PAUSE
-            TOX_FILE_CONTROL_CANCEL
+    def callback_file_recv_control(self, callback):
 
-        ctypedef enum TOX_ERR_FILE_CONTROL:
-            TOX_ERR_FILE_CONTROL_OK
-            TOX_ERR_FILE_CONTROL_FRIEND_NOT_FOUND
-            TOX_ERR_FILE_CONTROL_FRIEND_NOT_CONNECTED
-            TOX_ERR_FILE_CONTROL_NOT_FOUND
-            TOX_ERR_FILE_CONTROL_NOT_PAUSED
-            TOX_ERR_FILE_CONTROL_DENIED
-            TOX_ERR_FILE_CONTROL_ALREADY_PAUSED
-            TOX_ERR_FILE_CONTROL_SENDQ
-
-        bool tox_file_control(
-            Tox * tox,
-            uint32_t friend_number,
-            uint32_t file_number,
-            TOX_FILE_CONTROL control,
-            TOX_ERR_FILE_CONTROL * error
+        o = tuple(self, callback)
+        wayround_org.toxcorebind.tox_h.tox_callback_file_recv_control(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            _tox_file_recv_control_cb,
+            < void * >o
             )
 
-        ctypedef void tox_file_recv_control_cb(
-            Tox * tox,
-            uint32_t friend_number,
-            uint32_t file_number,
-            TOX_FILE_CONTROL control,
-            void * user_data
+        return
+
+    def file_seek(self, friend_number, file_number, position):
+
+        friend_number_check(friend_number)
+
+        file_number_check(file_number)
+
+        if not isinstance(position, int):
+            raise TypeError("`position' must be int")
+
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_FILE_SEEK error
+
+        ret = wayround_org.toxcorebind.tox_h.tox_file_seek(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            friend_number,
+            file_number,
+            position,
+            & error
             )
 
-        void tox_callback_file_recv_control(
-            Tox * tox,
-            tox_file_recv_control_cb * callback,
-            void * user_data
+        return bool(ret), error
+
+    def file_get_file_id(self, friend_number, file_number):
+
+        friend_number_check(friend_number)
+
+        file_number_check(file_number)
+
+        cdef uint8_t * _file_id
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_FILE_GET error
+
+        _file_id = <uint8_t * >libc.stdlib.malloc(
+            sizeof(uint8_t) * wayround_org.toxcorebind.tox_h.TOX_FILE_ID_LENGTH
             )
 
-        ctypedef enum TOX_ERR_FILE_SEEK:
-            TOX_ERR_FILE_SEEK_OK
-            TOX_ERR_FILE_SEEK_FRIEND_NOT_FOUND
-            TOX_ERR_FILE_SEEK_FRIEND_NOT_CONNECTED
-            TOX_ERR_FILE_SEEK_NOT_FOUND
-            TOX_ERR_FILE_SEEK_DENIED
-            TOX_ERR_FILE_SEEK_INVALID_POSITION
-            TOX_ERR_FILE_SEEK_SENDQ
-
-        bool tox_file_seek(
-            Tox * tox,
-            uint32_t friend_number,
-            uint32_t file_number,
-            uint64_t position,
-            TOX_ERR_FILE_SEEK * error
+        ret = wayround_org.toxcorebind.tox_h.tox_file_get_file_id(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            friend_number,
+            file_number,
+            _file_id,
+            & error
             )
 
-        ctypedef enum TOX_ERR_FILE_GET:
-            TOX_ERR_FILE_GET_OK
-            TOX_ERR_FILE_GET_NULL
-            TOX_ERR_FILE_GET_FRIEND_NOT_FOUND
-            TOX_ERR_FILE_GET_NOT_FOUND
+        if bool(ret):
+            file_id = _file_id[
+                :wayround_org.toxcorebind.tox_h.TOX_FILE_ID_LENGTH
+                ]
 
-        bool tox_file_get_file_id(
-            Tox * tox,
-            uint32_t friend_number,
-            uint32_t file_number,
-            uint8_t * file_id,
-            TOX_ERR_FILE_GET * error
-            )
+        libc.stdlib.free(_file_id)
+
+        return bool(ret), error, file_id
 
     # /*************************************************************************
     #  *
@@ -1052,61 +1086,72 @@ class Tox:
     #  *
     #  ************************************************************************/
 
-        ctypedef enum TOX_ERR_FILE_SEND:
-            TOX_ERR_FILE_SEND_OK
-            TOX_ERR_FILE_SEND_NULL
-            TOX_ERR_FILE_SEND_FRIEND_NOT_FOUND
-            TOX_ERR_FILE_SEND_FRIEND_NOT_CONNECTED
-            TOX_ERR_FILE_SEND_NAME_TOO_LONG
-            TOX_ERR_FILE_SEND_TOO_MANY
+    def file_send(self, friend_number, kind, file_size, file_id, filename):
 
-        uint32_t tox_file_send(
-            Tox * tox,
-            uint32_t friend_number,
-            uint32_t kind,
-            uint64_t file_size,
-            uint8_t * file_id,
-            const uint8_t * filename,
-            size_t filename_length,
-            TOX_ERR_FILE_SEND * error
+        # TODO: add all parameters checks
+
+        friend_number_check(friend_number)
+
+        if file_id is not None and not isinstance(file_id, bytes):
+            raise TypeError("`file_id' must be bytes")
+
+        if file_id is not None and len(file_id) != TOX_FILE_ID_LENGTH:
+            raise TypeError("`file_id' invalid format")
+
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_FILE_SEND error
+
+        cdef uint8_t * _file_id = NULL
+
+        if file_id is not None:
+            _file_id = file_id
+
+        ret = wayround_org.toxcorebind.tox_h.tox_file_send(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            friend_number,
+            kind,
+            file_size,
+            _file_id,
+            filename,
+            len(filename),
+            & error
             )
 
-        ctypedef enum TOX_ERR_FILE_SEND_CHUNK:
-            TOX_ERR_FILE_SEND_CHUNK_OK
-            TOX_ERR_FILE_SEND_CHUNK_NULL
-            TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_FOUND
-            TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_CONNECTED
-            TOX_ERR_FILE_SEND_CHUNK_NOT_FOUND
-            TOX_ERR_FILE_SEND_CHUNK_NOT_TRANSFERRING
-            TOX_ERR_FILE_SEND_CHUNK_INVALID_LENGTH
-            TOX_ERR_FILE_SEND_CHUNK_SENDQ
-            TOX_ERR_FILE_SEND_CHUNK_WRONG_POSITION
+        return ret, error
 
-        bool tox_file_send_chunk(
-            Tox * tox,
-            uint32_t friend_number,
-            uint32_t file_number,
-            uint64_t position,
-            uint8_t * data,
-            size_t length,
-            TOX_ERR_FILE_SEND_CHUNK * error
+    def file_send_chunk(self, friend_number, file_number, position, data):
+
+        friend_number_check(friend_number)
+
+        file_number_check(file_number)
+
+        file_position_check(position)
+
+        file_data_check(data)
+
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_FILE_SEND_CHUNK error
+
+        ret = wayround_org.toxcorebind.tox_h.tox_file_send_chunk(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            friend_number,
+            file_number,
+            position,
+            data,
+            len(data),
+            & error
             )
 
-        ctypedef void tox_file_chunk_request_cb(
-            Tox * tox,
-            uint32_t friend_number,
-            uint32_t file_number,
-            uint64_t position,
-            size_t length,
-            void * user_data
+        return bool(ret), error
+
+    def callback_file_chunk_request(self, callback):
+
+        o = tuple(self, callback)
+        wayround_org.toxcorebind.tox_h.tox_callback_file_chunk_request(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            _tox_file_chunk_request_cb,
+            < void * >o
             )
 
-        void tox_callback_file_chunk_request(
-            Tox * tox,
-            tox_file_chunk_request_cb * callback,
-            void * user_data
-            )
-
+        return
 
     # /*************************************************************************
     #  *
@@ -1114,28 +1159,27 @@ class Tox:
     #  *
     #  ************************************************************************/
 
-        ctypedef void tox_file_recv_cb(
-            Tox * tox,
-            uint32_t friend_number,
-            uint32_t file_number,
-            uint32_t kind,
-            uint64_t file_size,
-            const uint8_t * filename,
-            size_t filename_length,
-            void * user_data
+    def callback_file_recv(self, callback):
+
+        o = tuple(self, callback)
+        wayround_org.toxcorebind.tox_h.tox_callback_file_recv(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            _tox_file_recv_cb,
+            < void * >o
             )
 
-        void tox_callback_file_recv(
-            Tox * tox,
-            tox_file_recv_cb * callback,
-            void * user_data
+        return
+
+    def callback_file_recv_chunk(self, callback):
+
+        o = tuple(self, callback)
+        wayround_org.toxcorebind.tox_h.tox_callback_file_recv_chunk(
+            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
+            _tox_file_recv_chunk_cb,
+            < void * >o
             )
 
-        void tox_callback_file_recv_chunk(
-            Tox * tox,
-            tox_file_recv_chunk_cb * callback,
-            void * user_data
-            )
+        return
 
 
 def tox_new(options=None):
@@ -1165,11 +1209,39 @@ def tox_new(options=None):
         res = wayround_org.toxcorebind.tox_h.tox_new(NULL, & error)
 
     if error == 0:
-        ret = Tox(< uintptr_t > res)
+        ret = Tox( < uintptr_t > res)
         ret._ok = True
     else:
         ret = None
     return ret, error
+
+
+def tox_hash(self, data_in):
+
+    if not isinstance(data_in, bytes):
+        raise TypeError("`data_in' must be bytes")
+
+    cdef uint8_t * _data
+
+    hash_out = None
+
+    _data = <uint8_t * >libc.stdlib.malloc(
+        sizeof(uint8_t) * wayround_org.toxcorebind.TOX_HASH_LENGTH
+        )
+
+    ret = wayround_org.toxcorebind.tox_h.tox_hash(
+        _data,
+        data_in,
+        len(data_in)
+        )
+
+    if bool(ret):
+
+        hash_out = _data[:wayround_org.toxcorebind.TOX_HASH_LENGTH]
+
+    libc.stdlib.free(_data)
+
+    return bool(ret), hash_out
 
 
 # ************** checkers **************
@@ -1190,6 +1262,12 @@ def friend_number_check(friend_number):
     return
 
 
+def file_number_check(file_number):
+    if not isinstance(file_number, int):
+        raise TypeError("`file_number' must be int")
+    return
+
+
 def public_key_check(public_key):
     if not isinstance(public_key, bytes):
         raise TypeError("`public_key' must be bytes")
@@ -1200,10 +1278,10 @@ def public_key_check(public_key):
 
 
 def friend_request_message_check(request_message):
-    if not isinstance(message, bytes):
+    if not isinstance(request_message, bytes):
         raise TypeError("`request_message' must be bytes")
 
-    l = len(message)
+    l = len(request_message)
 
     if l < 1 or l > wayround_org.toxcorebind.tox_h.TOX_MAX_FRIEND_REQUEST_LENGTH:
         raise ValueError("`request_message' invalid format")
@@ -1220,90 +1298,205 @@ def friend_message_check(message):
         raise ValueError("`message' invalid format")
     return
 
+
+def file_position_check(position):
+    if not isinstance(position, int):
+        raise TypeError("`position' must be int")
+    return
+
+
+def file_data_check(file_data):
+    if not isinstance(file_data, bytes):
+        raise TypeError("`file_data' must be bytes")
+    return
+
+
+def message_type_check(message_type):
+    if not isinstance(message_type, int):
+        raise TypeError("`message_type' must be int")
+    return
+
 # ************** callbacks **************
 
 
-cdef _tox_friend_name_cb(
-        Tox * tox,
+cdef void _tox_friend_name_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
         uint32_t friend_number,
-        uint8_t * name,
+        const uint8_t * name,
         size_t length,
         void * user_data
         ):
 
     obj = < object > user_data
-    ret = obj[1](obj[0], friend_number, name[:length])
-    return ret
+    obj[1](obj[0], friend_number, name[:length])
+
+    return
 
 
-cdef _tox_self_connection_status_cb(
+cdef void _tox_self_connection_status_cb(
         wayround_org.toxcorebind.tox_h.Tox * tox,
         wayround_org.toxcorebind.tox_h.TOX_CONNECTION connection_status,
         void * user_data
         ):
-    obj = < object > user_data
-    ret = obj[1](obj[0], connection_status)
-    return ret
 
-    ctypedef void tox_friend_status_message_cb(
-        Tox * tox,
+    obj = < object > user_data
+    obj[1](obj[0], connection_status)
+
+    return
+
+cdef void _tox_friend_status_message_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
         uint32_t friend_number,
-        uint8_t * message,
+        const uint8_t * message,
         size_t length,
         void * user_data
-        )
+        ):
 
-    ctypedef void tox_friend_status_cb(
-        Tox * tox,
+    obj = < object > user_data
+    obj[1](obj[0], friend_number, message[:length])
+
+    return
+
+cdef void _tox_friend_status_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
         uint32_t friend_number,
-        TOX_USER_STATUS status,
+        wayround_org.toxcorebind.tox_h.TOX_USER_STATUS status,
         void * user_data
-        )
+        ):
 
-    ctypedef void tox_friend_connection_status_cb(
-        Tox * tox,
+    obj = < object > user_data
+    obj[1](obj[0], friend_number, status)
+
+    return
+
+cdef void _tox_friend_connection_status_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
         uint32_t friend_number,
-        TOX_CONNECTION connection_status,
+        wayround_org.toxcorebind.tox_h.TOX_CONNECTION connection_status,
         void * user_data
-        )
+        ):
 
-    ctypedef void tox_friend_typing_cb(
-        Tox * tox,
+    obj = < object > user_data
+    obj[1](obj[0], friend_number, connection_status)
+
+    return
+
+cdef void _tox_friend_typing_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
         uint32_t friend_number,
-        bool is_typing,
+        wayround_org.toxcorebind.tox_h.bool is_typing,
         void * user_data
-        )
+        ):
 
-    ctypedef void tox_friend_read_receipt_cb(
-        Tox * tox,
+    obj = < object > user_data
+    obj[1](obj[0], friend_number, bool(is_typing))
+
+    return
+
+cdef void _tox_friend_read_receipt_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
         uint32_t friend_number,
         uint32_t message_id,
         void * user_data
-        )
+        ):
 
-    ctypedef void tox_friend_request_cb(
-        Tox * tox,
-        uint8_t * public_key,
-        uint8_t * message,
+    obj = < object > user_data
+    obj[1](obj[0], friend_number, message_id)
+
+    return
+
+cdef void _tox_friend_request_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
+        const uint8_t * public_key,
+        const uint8_t * message,
         size_t length,
         void * user_data
+        ):
+
+    obj = < object > user_data
+    obj[1](
+        obj[0],
+        public_key[:wayround_org.toxcorebind.tox_h.TOX_PUBLIC_KEY_SIZE],
+        message[:length]
         )
 
-    ctypedef void tox_friend_message_cb(
-        Tox * tox,
+    return
+
+cdef void _tox_friend_message_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
         uint32_t friend_number,
-        TOX_MESSAGE_TYPE type,
-        uint8_t * message,
+        wayround_org.toxcorebind.tox_h.TOX_MESSAGE_TYPE type_,
+        const uint8_t * message,
         size_t length,
         void * user_data
-        )
+        ):
 
-    ctypedef void tox_file_recv_chunk_cb(
-        Tox * tox,
+    obj = < object > user_data
+    obj[1](obj[0], friend_number, type_, message[:length])
+
+    return
+
+cdef void _tox_file_recv_chunk_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
         uint32_t friend_number,
         uint32_t file_number,
         uint64_t position,
         const uint8_t * data,
         size_t length,
         void * user_data
-        )        
+        ):
+
+    obj = < object > user_data
+    obj[1](obj[0], friend_number, file_number, position, data[:length])
+
+    return
+
+cdef void _tox_file_recv_control_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
+        uint32_t friend_number,
+        uint32_t file_number,
+        wayround_org.toxcorebind.tox_h.TOX_FILE_CONTROL control,
+        void * user_data
+        ):
+
+    obj = < object > user_data
+    obj[1](obj[0], friend_number, file_number, control)
+
+    return
+
+cdef void _tox_file_chunk_request_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
+        uint32_t friend_number,
+        uint32_t file_number,
+        uint64_t position,
+        size_t length,
+        void * user_data
+        ):
+
+    obj = < object > user_data
+    obj[1](obj[0], friend_number, file_number, position, length)
+
+    return
+
+cdef void _tox_file_recv_cb(
+        wayround_org.toxcorebind.tox_h.Tox * tox,
+        uint32_t friend_number,
+        uint32_t file_number,
+        uint32_t kind,
+        uint64_t file_size,
+        const uint8_t * filename,
+        size_t filename_length,
+        void * user_data
+        ):
+
+    obj = < object > user_data
+    obj[1](
+        obj[0],
+        friend_number,
+        file_number,
+        kind,
+        file_size,
+        filename[:filename_length]
+        )
+
+    return
