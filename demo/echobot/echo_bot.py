@@ -10,7 +10,7 @@ import wayround_org.toxcorebind.tox
 
 print("creating tox")
 
-tox, error = wayround_org.toxcorebind.tox.tox_new()
+tox, error = wayround_org.toxcorebind.tox.Tox.new()
 
 if error != 0:
     print("error creating Tox instance")

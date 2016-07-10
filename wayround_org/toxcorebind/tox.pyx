@@ -78,6 +78,19 @@ TOX_SAVEDATA_TYPE_SECRET_KEY = wayround_org.toxcorebind.tox_h.TOX_SAVEDATA_TYPE_
 
 class Tox_Options:
 
+    @classmethod
+    def tox_options_new(cls):
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_OPTIONS_NEW error
+        cdef wayround_org.toxcorebind.tox_h.Tox_Options * res
+        res = wayround_org.toxcorebind.tox_h.tox_options_new(& error)
+        if error == 0:
+            ret = cls(< uintptr_t > res)
+            ret.reset_defaults()
+            ret._ok = True
+        else:
+            ret = None
+        return ret, error
+
     def __init__(self, pointer):
         self._pointer = pointer
         self._ok = False
@@ -99,7 +112,7 @@ class Tox_Options:
     @property
     def ipv6_enabled(self):
         ret = bool(
-            ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+            (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
             .ipv6_enabled
             )
         return ret
@@ -113,7 +126,7 @@ class Tox_Options:
     @property
     def udp_enabled(self):
         ret = bool(
-         ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+         (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
          .udp_enabled
          )
         return ret
@@ -225,7 +238,7 @@ class Tox_Options:
 
     @property
     def savedata_data(self):
-        t = ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+        t = (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
         ret = t.savedata_data[0:self.savedata_length]
         return ret
 
@@ -246,20 +259,41 @@ class Tox_Options:
         return ret
 
 
-def tox_options_new():
-    cdef wayround_org.toxcorebind.tox_h.TOX_ERR_OPTIONS_NEW error
-    cdef wayround_org.toxcorebind.tox_h.Tox_Options * res
-    res = wayround_org.toxcorebind.tox_h.tox_options_new( & error)
-    if error == 0:
-        ret = Tox_Options( < uintptr_t > res)
-        ret.reset_defaults()
-        ret._ok = True
-    else:
-        ret = None
-    return ret, error
-
-
 class Tox:
+
+    @classmethod
+    def tox_new(cls, options=None):
+
+        if options is not None and not isinstance(options, Tox_Options):
+            raise TypeError("`options' invalid type")
+
+        if (options is not None and
+                (not hasattr(options, '_ok') or not options._ok)):
+            raise ValueError(
+                "`options' value should have been created with "
+                "tox_options_new()"
+                )
+
+        cdef wayround_org.toxcorebind.tox_h.TOX_ERR_NEW error
+        cdef wayround_org.toxcorebind.tox_h.Tox * res
+
+        if options is not None:
+
+            res = wayround_org.toxcorebind.tox_h.tox_new(
+                < wayround_org.toxcorebind.tox_h.Tox_Options * >options._pointer,
+                & error
+                )
+
+        else:
+
+            res = wayround_org.toxcorebind.tox_h.tox_new(NULL, & error)
+
+        if error == 0:
+            ret = cls(< uintptr_t > res)
+            ret._ok = True
+        else:
+            ret = None
+        return ret, error
 
     def __init__(self, pointer):
         self._pointer = pointer
@@ -1180,40 +1214,6 @@ class Tox:
             )
 
         return
-
-
-def tox_new(options=None):
-
-    if options is not None and not isinstance(options, Tox_Options):
-        raise TypeError("`options' invalid type")
-
-    if (options is not None and
-            (not hasattr(options, '_ok') or not options._ok)):
-        raise ValueError(
-            "`options' value should have been created with "
-            "tox_options_new()"
-            )
-
-    cdef wayround_org.toxcorebind.tox_h.TOX_ERR_NEW error
-    cdef wayround_org.toxcorebind.tox_h.Tox * res
-
-    if options is not None:
-
-        res = wayround_org.toxcorebind.tox_h.tox_new(
-            < wayround_org.toxcorebind.tox_h.Tox_Options * >options._pointer,
-            & error
-            )
-
-    else:
-
-        res = wayround_org.toxcorebind.tox_h.tox_new(NULL, & error)
-
-    if error == 0:
-        ret = Tox( < uintptr_t > res)
-        ret._ok = True
-    else:
-        ret = None
-    return ret, error
 
 
 def tox_hash(self, data_in):

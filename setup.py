@@ -6,7 +6,6 @@ from setuptools import setup, Extension
 #from Cython.Build import cythonize
 from Cython.Distutils import build_ext
 
-
 import wayround_org.utils.cython
 import wayround_org.utils.pkgconfig
 
@@ -35,12 +34,6 @@ libs = wayround_org.utils.pkgconfig.pkgconfig_libs(
     remove_ls=True
     )
 
-if isinstance(include_dirs, str):
-    include_dirs = include_dirs.split()
-
-if isinstance(libs, str):
-    libs = libs.split()
-
 extensions = [
     Extension(
         "wayround_org.toxcorebind.tox",
@@ -59,7 +52,7 @@ wayround_org.utils.cython.cythonize(
 
 setup(
     name='wayround_org_toxcorebind',
-    version='0.2.3',
+    version='0.3',
     author='Alexey Gorshkov',
     author_email='animus@wayround.org',
     url='https://github.com/AnimusPEXUS/wayround_org_toxcorebind',
@@ -75,7 +68,7 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: POSIX',
         ],
-    ext_modules=extensions, #cythonize(extensions),
+    ext_modules=extensions,
     cmdclass={'build_ext': build_ext},
     package_data={'wayround_org.toxcorebind': ['*.pxd']},
     )
