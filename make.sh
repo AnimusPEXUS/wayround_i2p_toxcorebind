@@ -1,2 +1,2 @@
 #!/bin/bash
-reset ; make clean ; make
+reset ; make
