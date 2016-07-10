@@ -358,12 +358,11 @@ class Tox:
         return ret
 
     def callback_self_connection_status(self, callback):
-        o = tuple(self, callback)
+        self._tox_self_connection_status_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_self_connection_status(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
-            < wayround_org.toxcorebind.tox_h.tox_self_connection_status_cb * >
             _tox_self_connection_status_cb,
-            < void * >o
+            < void * >self._tox_self_connection_status_cb_data
             )
         return
 
@@ -778,11 +777,11 @@ class Tox:
         return bool(ret), error, name
 
     def callback_friend_name(self, callback):
-        o = tuple(self, callback)
+        self._tox_friend_name_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_friend_name(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_friend_name_cb,
-            < void * >o
+            < void * >self._tox_friend_name_cb_data
             )
         return
 
@@ -829,11 +828,11 @@ class Tox:
         return bool(ret), error, status_message
 
     def callback_friend_status_message(self, callback):
-        o = tuple(self, callback)
+        self._tox_friend_status_message_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_friend_status_message(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_friend_status_message_cb,
-            < void * >o
+            < void * >self._tox_friend_status_message_cb_data
             )
         return
 
@@ -852,11 +851,11 @@ class Tox:
         return ret
 
     def callback_friend_status(self, callback):
-        o = tuple(self, callback)
+        self._tox_friend_status_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_friend_status(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_friend_status_cb,
-            < void * >o
+            < void * >self._tox_friend_status_cb_data
             )
         return
 
@@ -875,11 +874,11 @@ class Tox:
         return ret, error
 
     def callback_friend_status(self, callback):
-        o = tuple(self, callback)
+        self._tox_friend_connection_status_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_friend_connection_status(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_friend_connection_status_cb,
-            < void * >o
+            < void * >self._tox_friend_connection_status_cb_data
             )
         return
 
@@ -898,11 +897,11 @@ class Tox:
         return bool(ret), error
 
     def callback_friend_typing(self, callback):
-        o = tuple(self, callback)
+        self._tox_friend_typing_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_friend_typing(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_friend_typing_cb,
-            < void * >o
+            < void * >self._tox_friend_typing_cb_data
             )
         return
 
@@ -930,7 +929,7 @@ class Tox:
 
         return bool(ret), error
 
-    def friend_send_message(self, friend_number, message, message_type):
+    def friend_send_message(self, friend_number, message_type, message):
 
         friend_number_check(friend_number)
         friend_message_check(message)
@@ -951,11 +950,11 @@ class Tox:
 
     def callback_friend_read_receipt(self, callback):
 
-        o = tuple(self, callback)
+        self._tox_friend_read_receipt_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_friend_read_receipt(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_friend_read_receipt_cb,
-            < void * >o
+            < void * >self._tox_friend_read_receipt_cb_data
             )
 
         return
@@ -968,22 +967,23 @@ class Tox:
 
     def callback_friend_request(self, callback):
 
-        o = tuple(self, callback)
+        self._tox_friend_request_cb_data = self, callback
+
         wayround_org.toxcorebind.tox_h.tox_callback_friend_request(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_friend_request_cb,
-            < void * >o
+            < void * >self._tox_friend_request_cb_data
             )
 
         return
 
     def callback_friend_message(self, callback):
 
-        o = tuple(self, callback)
+        self._tox_friend_message_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_friend_message(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_friend_message_cb,
-            < void * >o
+            < void * >self._tox_friend_message_cb_data
             )
 
         return
@@ -1020,11 +1020,11 @@ class Tox:
 
     def callback_file_recv_control(self, callback):
 
-        o = tuple(self, callback)
+        self._tox_file_recv_control_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_file_recv_control(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_file_recv_control_cb,
-            < void * >o
+            < void * >self._tox_file_recv_control_cb_data
             )
 
         return
@@ -1144,11 +1144,11 @@ class Tox:
 
     def callback_file_chunk_request(self, callback):
 
-        o = tuple(self, callback)
+        self._tox_file_chunk_request_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_file_chunk_request(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_file_chunk_request_cb,
-            < void * >o
+            < void * >self._tox_file_chunk_request_cb_data
             )
 
         return
@@ -1161,22 +1161,22 @@ class Tox:
 
     def callback_file_recv(self, callback):
 
-        o = tuple(self, callback)
+        self._tox_file_recv_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_file_recv(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_file_recv_cb,
-            < void * >o
+            < void * >self._tox_file_recv_cb_data
             )
 
         return
 
     def callback_file_recv_chunk(self, callback):
 
-        o = tuple(self, callback)
+        self._tox_file_recv_chunk_cb_data = self, callback
         wayround_org.toxcorebind.tox_h.tox_callback_file_recv_chunk(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             _tox_file_recv_chunk_cb,
-            < void * >o
+            < void * >self._tox_file_recv_chunk_cb_data
             )
 
         return
@@ -1414,6 +1414,7 @@ cdef void _tox_friend_request_cb(
         ):
 
     obj = < object > user_data
+
     obj[1](
         obj[0],
         public_key[:wayround_org.toxcorebind.tox_h.TOX_PUBLIC_KEY_SIZE],
