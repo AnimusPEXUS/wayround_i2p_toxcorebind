@@ -52,7 +52,7 @@ wayround_org.utils.cython.cythonize(
 
 setup(
     name='wayround_org_toxcorebind',
-    version='0.3',
+    version='0.3.1',
     author='Alexey Gorshkov',
     author_email='animus@wayround.org',
     url='https://github.com/AnimusPEXUS/wayround_org_toxcorebind',

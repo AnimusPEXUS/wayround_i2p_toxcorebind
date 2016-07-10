@@ -79,7 +79,7 @@ TOX_SAVEDATA_TYPE_SECRET_KEY = wayround_org.toxcorebind.tox_h.TOX_SAVEDATA_TYPE_
 class Tox_Options:
 
     @classmethod
-    def tox_options_new(cls):
+    def new(cls):
         cdef wayround_org.toxcorebind.tox_h.TOX_ERR_OPTIONS_NEW error
         cdef wayround_org.toxcorebind.tox_h.Tox_Options * res
         res = wayround_org.toxcorebind.tox_h.tox_options_new(& error)
@@ -262,7 +262,7 @@ class Tox_Options:
 class Tox:
 
     @classmethod
-    def tox_new(cls, options=None):
+    def new(cls, options=None):
 
         if options is not None and not isinstance(options, Tox_Options):
             raise TypeError("`options' invalid type")
