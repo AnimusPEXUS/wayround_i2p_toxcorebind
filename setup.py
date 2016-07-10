@@ -77,10 +77,20 @@ wayround_org.utils.cython.cythonize(
 
 setup(
     name='wayround_org_toxcorebind',
-    version='0.2',
+    version='0.2.1',
+    author='Alexey Gorshkov',
+    author_email='animus@wayround.org',
+    url='https://github.com/AnimusPEXUS/wayround_org_toxcorebind',
     description='Python toxcore binding',
     packages=[
         'wayround_org.toxcorebind'
+        ],
+    install_requires=[
+        'wayround_org_utils',
+        ],
+    classifiers=[
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'Operating System :: POSIX',
         ],
     ext_modules=extensions, #cythonize(extensions),
     cmdclass={'build_ext': build_ext},
