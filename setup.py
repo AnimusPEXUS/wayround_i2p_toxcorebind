@@ -19,9 +19,6 @@ if cflags is None or ldflags is None:
         " using pkg-config"
         )
 
-if ldflags is None:
-    raise Exception("can't determine --cflags using pkg-config")
-
 if isinstance(cflags, str):
     cflags = cflags.split()
 
@@ -44,20 +41,6 @@ if isinstance(include_dirs, str):
 if isinstance(libs, str):
     libs = libs.split()
 
-line = '-' * 10
-
-'''
-print("""\
----v--- libtoxcore information ---v---
-cflags: {}
-ldflags: {}
----^--- libtoxcore information ---^---""".format(
-    cflags,
-    ldflags
-    )
-    )
-'''
-
 extensions = [
     Extension(
         "wayround_org.toxcorebind.tox",
@@ -69,7 +52,6 @@ extensions = [
         )
     ]
 
-#print("Cythonizing...")
 wayround_org.utils.cython.cythonize(
     glob.glob('wayround_org/toxcorebind/*.pyx'),
     cython_options=['-3']
@@ -77,7 +59,7 @@ wayround_org.utils.cython.cythonize(
 
 setup(
     name='wayround_org_toxcorebind',
-    version='0.2.1',
+    version='0.2.3',
     author='Alexey Gorshkov',
     author_email='animus@wayround.org',
     url='https://github.com/AnimusPEXUS/wayround_org_toxcorebind',
@@ -86,6 +68,7 @@ setup(
         'wayround_org.toxcorebind'
         ],
     install_requires=[
+        'Cython',
         'wayround_org_utils',
         ],
     classifiers=[
