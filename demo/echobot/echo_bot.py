@@ -4,6 +4,7 @@
 # https://wiki.tox.chat/developers/client_examples/echo_bot
 
 import time
+import threading
 
 import wayround_org.toxcorebind.tox
 
@@ -28,7 +29,7 @@ print(
 print(
     "set name result: {}".format(
         tox.self_set_name(
-            'Echo Bot'.encode('utf-8')
+            b'Echo Bot'
             )
         )
     )
@@ -52,7 +53,7 @@ print(
 print(
     "set status_message result: {}".format(
         tox.self_set_status_message(
-            'Echoing your messages'.encode('utf-8')
+            b'Echoing your messages'
             )
         )
     )
@@ -67,51 +68,15 @@ print(
 print()
 
 print("address: {}".format(tox.self_get_address().hex()))
-print("nospam: {}".format(tox.self_get_nospam()))
+print("nospam (integer): {}".format(tox.self_get_nospam()))
 
-print("nospam bytes: {}".format(tox.self_get_nospam_bytes().hex()))
+print("nospam (bytes)  : {}".format(tox.self_get_nospam_bytes().hex()))
 
 print("bootstrapping...")
 
+bootstrap_hosts = wayround_org.toxcorebind.tox.get_std_bootstrap_hosts()
 
-for i in [
-        (
-            b'144.76.60.215',
-            33445,
-            bytes.fromhex(
-                '04119E835DF3E78BACF0F84235B300546AF8B936F035185E2A8E9E0A67C8924F'
-            )
-        ),
-        (
-            b'23.226.230.47',
-            33445,
-            bytes.fromhex(
-                'A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074'
-            )
-        ),
-        (
-            b'178.21.112.187',
-            33445,
-            bytes.fromhex(
-                '4B2C19E924972CB9B57732FB172F8A8604DE13EEDA2A6234E348983344B23057'
-            )
-        ),
-        (
-            b'195.154.119.113',
-            33445,
-            bytes.fromhex(
-                'E398A69646B8CEACA9F0B84F553726C1C49270558C57DF5F3C368F05A7D71354'
-            )
-        ),
-        (
-            b'192.210.149.121',
-            33445,
-            bytes.fromhex(
-                'F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67'
-            )
-        )
-        ]:
-
+for i in bootstrap_hosts:
     print("    {}: {}".format(i[2].hex(), tox.bootstrap(*i)))
 
 
@@ -140,7 +105,37 @@ def friend_message_cb(obj, friend_number, type_, message):
 
 tox.callback_friend_message(friend_message_cb)
 
-while True:
 
-    tox.iterate()
-    time.sleep(tox.iteration_interval() / 1000)
+def connection_status(self, connection_status):
+
+    csn = None
+
+    if connection_status == wayround_org.toxcorebind.tox.TOX_CONNECTION_NONE:
+        csn = 'NONE'
+    elif connection_status == wayround_org.toxcorebind.tox.TOX_CONNECTION_UDP:
+        csn = 'UDP'
+    elif connection_status == wayround_org.toxcorebind.tox.TOX_CONNECTION_TCP:
+        csn = 'TCP'
+    else:
+        csn = 'ERROR'
+    print("connection status now is: {}".format(csn))
+    return
+
+tox.callback_self_connection_status(connection_status)
+
+stop_flag = threading.Event()
+
+
+def a(f):
+    while True:
+        if stop_flag.is_set():
+            print("stopping")
+            break
+        tox.iterate()
+        time.sleep(tox.iteration_interval() / 1000)
+
+threading.Thread(target=a, args=(stop_flag,)).start()
+
+input()
+
+stop_flag.set()

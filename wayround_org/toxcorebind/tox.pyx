@@ -32,6 +32,60 @@ TOX_FILE_ID_LENGTH = wayround_org.toxcorebind.tox_h.TOX_FILE_ID_LENGTH
 TOX_MAX_FILENAME_LENGTH = wayround_org.toxcorebind.tox_h.TOX_MAX_FILENAME_LENGTH
 
 
+def get_std_bootstrap_hosts():
+    ret = [
+        (
+            b'144.76.60.215',
+            33445,
+            bytes.fromhex(
+                '04119E835DF3E78BACF0F84235B300546AF8B936F035185E2A8E9E0A67C8924F'
+            )
+        ),
+        (
+            b'23.226.230.47',
+            33445,
+            bytes.fromhex(
+                'A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074'
+            )
+        ),
+        (
+            b'178.21.112.187',
+            33445,
+            bytes.fromhex(
+                '4B2C19E924972CB9B57732FB172F8A8604DE13EEDA2A6234E348983344B23057'
+            )
+        ),
+        (
+            b'195.154.119.113',
+            33445,
+            bytes.fromhex(
+                'E398A69646B8CEACA9F0B84F553726C1C49270558C57DF5F3C368F05A7D71354'
+            )
+        ),
+        (
+            b'192.210.149.121',
+            33445,
+            bytes.fromhex(
+                'F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67'
+            )
+        )
+        ]
+    '''
+    # for debugging
+    ret = [
+        (
+            b'127.0.0.1',
+            33445,
+            bytes.fromhex(
+                'A0190D5AECEB0A9DAD355BE2C957BA1FBA01B8BE31EB8719D21A23F7B4E0671B'
+                )
+            )
+        ]
+    '''
+
+    return ret
+
+
 def tox_version_major():
     return < int > wayround_org.toxcorebind.tox_h.tox_version_major()
 
@@ -75,6 +129,10 @@ TOX_SAVEDATA_TYPE_NONE = wayround_org.toxcorebind.tox_h.TOX_SAVEDATA_TYPE_NONE
 TOX_SAVEDATA_TYPE_TOX_SAVE = wayround_org.toxcorebind.tox_h.TOX_SAVEDATA_TYPE_TOX_SAVE
 TOX_SAVEDATA_TYPE_SECRET_KEY = wayround_org.toxcorebind.tox_h.TOX_SAVEDATA_TYPE_SECRET_KEY
 
+TOX_CONNECTION_NONE = wayround_org.toxcorebind.tox_h.TOX_CONNECTION_NONE
+TOX_CONNECTION_TCP = wayround_org.toxcorebind.tox_h.TOX_CONNECTION_TCP
+TOX_CONNECTION_UDP = wayround_org.toxcorebind.tox_h.TOX_CONNECTION_UDP
+
 
 class Tox_Options:
 
@@ -82,9 +140,9 @@ class Tox_Options:
     def new(cls):
         cdef wayround_org.toxcorebind.tox_h.TOX_ERR_OPTIONS_NEW error
         cdef wayround_org.toxcorebind.tox_h.Tox_Options * res
-        res = wayround_org.toxcorebind.tox_h.tox_options_new(& error)
+        res = wayround_org.toxcorebind.tox_h.tox_options_new( & error)
         if error == 0:
-            ret = cls(< uintptr_t > res)
+            ret = cls( < uintptr_t > res)
             ret.reset_defaults()
             ret._ok = True
         else:
@@ -93,6 +151,7 @@ class Tox_Options:
 
     def __init__(self, pointer):
         self._pointer = pointer
+        #self._savedata_data = None
         self._ok = False
         return
 
@@ -101,6 +160,10 @@ class Tox_Options:
             < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer
             )
         self._pointer = None
+
+        #if self._savedata_data is not None:
+        #    libc.stdlib.free( < void*> < uintptr_t > self._savedata_data)
+        #    self._savedata_data = None
         return
 
     def reset_defaults(self):
@@ -112,7 +175,7 @@ class Tox_Options:
     @property
     def ipv6_enabled(self):
         ret = bool(
-            (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+            ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
             .ipv6_enabled
             )
         return ret
@@ -126,7 +189,7 @@ class Tox_Options:
     @property
     def udp_enabled(self):
         ret = bool(
-         (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+         ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
          .udp_enabled
          )
         return ret
@@ -238,7 +301,7 @@ class Tox_Options:
 
     @property
     def savedata_data(self):
-        t = (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+        t = ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
         ret = t.savedata_data[0:self.savedata_length]
         return ret
 
@@ -246,10 +309,31 @@ class Tox_Options:
     def savedata_data(self, value):
         if not isinstance(value, bytes):
             raise TypeError("bytes expected")
+
+        '''
+        if self._savedata_data is not None:
+            libc.stdlib.free(< void*> < uintptr_t > self._savedata_data)
+
+        l = len(value)
+
+        self._savedata_data = < uintptr_t > libc.stdlib.malloc(l)
+
+        libc.string.memcpy(
+            < void * > < uintptr_t > self._savedata_data,
+            < uint8_t * >value,
+            l
+            )
+
+        ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)\
+            .savedata_data = < uint8_t * > < uintptr_t > self._savedata_data
+        ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)\
+            .savedata_length = l
+        '''
         ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)\
             .savedata_data = value
         ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)\
             .savedata_length = len(value)
+        #'''
         return
 
     @property
@@ -271,7 +355,7 @@ class Tox:
                 (not hasattr(options, '_ok') or not options._ok)):
             raise ValueError(
                 "`options' value should have been created with "
-                "tox_options_new()"
+                "Tox_Options.new()"
                 )
 
         cdef wayround_org.toxcorebind.tox_h.TOX_ERR_NEW error
@@ -280,7 +364,7 @@ class Tox:
         if options is not None:
 
             res = wayround_org.toxcorebind.tox_h.tox_new(
-                < wayround_org.toxcorebind.tox_h.Tox_Options * >options._pointer,
+                < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > options._pointer,
                 & error
                 )
 
@@ -289,21 +373,32 @@ class Tox:
             res = wayround_org.toxcorebind.tox_h.tox_new(NULL, & error)
 
         if error == 0:
-            ret = cls(< uintptr_t > res)
-            ret._ok = True
+            ret = cls( < uintptr_t > res, is_live=True, kill_on_del=True)
         else:
             ret = None
         return ret, error
 
-    def __init__(self, pointer):
+    def __init__(self, pointer, is_live=False, kill_on_del=False):
         self._pointer = pointer
-        self._ok = False
+        self._kill_on_del = kill_on_del
+        self._is_live = is_live
         return
 
+    def __del__(self):
+        if self._is_live and self._kill_on_del:
+            self.kill()
+        return
+
+    @property
+    def is_live(self):
+        return bool(self._is_live)
+
     def kill(self):
-        wayround_org.toxcorebind.tox_h.tox_kill(
-            < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer
-            )
+        if self.is_live:
+            wayround_org.toxcorebind.tox_h.tox_kill(
+                < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer
+                )
+            self._is_live = False
         return
 
     def get_savedata_size(self):
@@ -318,14 +413,14 @@ class Tox:
 
         size = self.get_savedata_size()
 
-        data = <uint8_t * >libc.stdlib.malloc(size)
+        data = <uint8_t * >libc.stdlib.malloc(sizeof(uint8_t) * size)
 
         ret = wayround_org.toxcorebind.tox_h.tox_get_savedata(
             < wayround_org.toxcorebind.tox_h.Tox * > < uintptr_t > self._pointer,
             data
             )
 
-        ret = <bytes > data[:size]
+        ret = data[:size]
 
         libc.stdlib.free(data)
 
