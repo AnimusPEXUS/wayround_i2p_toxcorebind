@@ -151,7 +151,6 @@ class Tox_Options:
 
     def __init__(self, pointer):
         self._pointer = pointer
-        self._savedata_data = None
         self._ok = False
         return
 
@@ -160,10 +159,6 @@ class Tox_Options:
             < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer
             )
         self._pointer = None
-
-        # if self._savedata_data is not None:
-        #    libc.stdlib.free( < void*> < uintptr_t > self._savedata_data)
-        #    self._savedata_data = None
         return
 
     def reset_defaults(self):
@@ -310,31 +305,10 @@ class Tox_Options:
         if not isinstance(value, bytes):
             raise TypeError("bytes expected")
 
-        #'''
-        if self._savedata_data is not None:
-            libc.stdlib.free(< void*> < uintptr_t > self._savedata_data)
-
-        l = len(value)
-
-        self._savedata_data = < uintptr_t > libc.stdlib.malloc(l)
-
-        libc.string.memcpy(
-            < void * > < uintptr_t > self._savedata_data,
-            < uint8_t * >value,
-            l
-            )
-
-        ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)\
-            .savedata_data = < uint8_t * > < uintptr_t > self._savedata_data
-        ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)\
-            .savedata_length = l
-        '''
         ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)\
             .savedata_data = <uint8_t * >value
         ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)\
             .savedata_length = len(value)
-        self._savedata_data = value
-        '''
         return
 
     @property
