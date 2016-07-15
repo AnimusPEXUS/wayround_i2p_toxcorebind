@@ -140,9 +140,9 @@ class Tox_Options:
     def new(cls):
         cdef wayround_org.toxcorebind.tox_h.TOX_ERR_OPTIONS_NEW error
         cdef wayround_org.toxcorebind.tox_h.Tox_Options * res
-        res = wayround_org.toxcorebind.tox_h.tox_options_new(& error)
+        res = wayround_org.toxcorebind.tox_h.tox_options_new( & error)
         if error == 0:
-            ret = cls(< uintptr_t > res)
+            ret = cls( < uintptr_t > res)
             ret.reset_defaults()
             ret._ok = True
         else:
@@ -170,7 +170,7 @@ class Tox_Options:
     @property
     def ipv6_enabled(self):
         ret = bool(
-            (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+            ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
             .ipv6_enabled
             )
         return ret
@@ -184,7 +184,7 @@ class Tox_Options:
     @property
     def udp_enabled(self):
         ret = bool(
-         (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+         ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
          .udp_enabled
          )
         return ret
@@ -222,6 +222,7 @@ class Tox_Options:
             raise TypeError("bytes expected")
         ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)\
             .proxy_host = value
+        self._proxy_host = value
         return
 
     @property
@@ -296,7 +297,7 @@ class Tox_Options:
 
     @property
     def savedata_data(self):
-        t = (< wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
+        t = ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)
         ret = t.savedata_data[0:self.savedata_length]
         return ret
 
@@ -309,6 +310,8 @@ class Tox_Options:
             .savedata_data = <uint8_t * >value
         ( < wayround_org.toxcorebind.tox_h.Tox_Options * > < uintptr_t > self._pointer)\
             .savedata_length = len(value)
+
+        self._savedata_data = value  # NOTE: this is to keep value alive
         return
 
     @property
@@ -348,7 +351,7 @@ class Tox:
             res = wayround_org.toxcorebind.tox_h.tox_new(NULL, & error)
 
         if error == 0:
-            ret = cls(< uintptr_t > res, is_live=True, kill_on_del=True)
+            ret = cls( < uintptr_t > res, is_live=True, kill_on_del=True)
         else:
             ret = None
         return ret, error
