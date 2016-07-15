@@ -3,6 +3,7 @@
 # some simple analog of bot given here
 # https://wiki.tox.chat/developers/client_examples/echo_bot
 
+import os.path
 import time
 import threading
 
@@ -11,7 +12,18 @@ import wayround_org.toxcorebind.tox
 
 print("creating tox")
 
-tox, error = wayround_org.toxcorebind.tox.Tox.new()
+data_file_name = 'file.dat'
+
+options, error = wayround_org.toxcorebind.tox.Tox_Options.new()
+
+if os.path.isfile(data_file_name):
+    with open(data_file_name, 'rb') as f:
+        dat_data = f.read()
+
+    options.savedata_data = dat_data
+    options.savedata_type = wayround_org.toxcorebind.tox.TOX_SAVEDATA_TYPE_TOX_SAVE
+
+tox, error = wayround_org.toxcorebind.tox.Tox.new(options=options)
 
 if error != 0:
     print("error creating Tox instance")
@@ -139,3 +151,7 @@ threading.Thread(target=a, args=(stop_flag,)).start()
 input()
 
 stop_flag.set()
+
+
+with open(data_file_name, 'wb') as f:
+    f.write(tox.get_savedata())
