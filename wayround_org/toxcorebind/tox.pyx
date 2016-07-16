@@ -1368,7 +1368,7 @@ def friend_message_check(message):
     l = len(message)
 
     if l < 1 or l > wayround_org.toxcorebind.tox_h.TOX_MAX_MESSAGE_LENGTH:
-        raise ValueError("`message' invalid format")
+        raise ValueError("`message' invalid format (length: {})".format(l))
     return
 
 
