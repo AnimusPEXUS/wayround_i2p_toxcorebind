@@ -13,6 +13,8 @@ from libc.stdint cimport *
 import builtins
 import sys
 
+import wayround_org.utils.text
+
 # UINT64_MAX = libc.stdint.UINT64_MAX
 
 TOX_VERSION_MAJOR = wayround_org.toxcorebind.tox_h.TOX_VERSION_MAJOR
@@ -1055,6 +1057,46 @@ class Tox:
 
         return ret, error
 
+    def friend_send_message_long_string(
+            self,
+            friend_number,
+            message_type,
+            message,
+            encoding='utf-8'
+            ):
+
+        friend_number_check(friend_number)
+        friend_message_long_string_check(message)
+        message_type_check(message_type)
+
+        ebl = wayround_org.utils.text.str_to_encoded_bytes_list(
+            message,
+            encoding
+            )
+
+        ebl = wayround_org.utils.text.encoded_bytes_list_split_by_size(
+            ebl,
+            wayround_org.toxcorebind.tox_h.TOX_MAX_MESSAGE_LENGTH
+            )
+
+        wayround_org.utils.text.merge_encoded_bylentes_lists_inside_list(ebl)
+
+        ret = []
+        error = wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_SEND_MESSAGE_OK
+
+        for i in ebl:
+            res, error = self.friend_send_message(
+                friend_number,
+                message_type,
+                i
+                )
+
+            ret.append(res)
+            if error != wayround_org.toxcorebind.tox_h.TOX_ERR_FRIEND_SEND_MESSAGE_OK:
+                break
+
+        return ret, error
+
     def callback_friend_read_receipt(self, callback):
 
         self._tox_friend_read_receipt_cb_data = self, callback
@@ -1341,12 +1383,24 @@ def file_number_check(file_number):
     return
 
 
+class ToxPublicKeyException(Exception):
+    pass
+
+
+class ToxPublicKeyInvalidType(ToxPublicKeyException):
+    pass
+
+
+class ToxPublicKeyInvalidFormat(ToxPublicKeyException):
+    pass
+
+
 def public_key_check(public_key):
     if not isinstance(public_key, bytes):
-        raise TypeError("`public_key' must be bytes")
+        raise ToxPublicKeyInvalidType("`public_key' must be bytes")
 
     if len(public_key) != wayround_org.toxcorebind.tox_h.TOX_PUBLIC_KEY_SIZE:
-        raise ValueError("`public_key' invalid format")
+        raise ToxPublicKeyInvalidFormat("`public_key' invalid format")
     return
 
 
@@ -1369,6 +1423,12 @@ def friend_message_check(message):
 
     if l < 1 or l > wayround_org.toxcorebind.tox_h.TOX_MAX_MESSAGE_LENGTH:
         raise ValueError("`message' invalid format (length: {})".format(l))
+    return
+
+
+def friend_message_long_string_check(message):
+    if not isinstance(message, str):
+        raise TypeError("`message' must be str type")
     return
 
 

@@ -38,8 +38,6 @@ extensions = [
     Extension(
         "wayround_org.toxcorebind.tox",
         ["wayround_org/toxcorebind/tox.pyx"],
-        # libraries=libs,
-        # include_dirs=include_dirs,
         extra_compile_args=cflags,
         extra_link_args=ldflags
         )
@@ -52,7 +50,7 @@ wayround_org.utils.cython.cythonize(
 
 setup(
     name='wayround_org_toxcorebind',
-    version='0.5',
+    version='0.6',
     author='Alexey Gorshkov',
     author_email='animus@wayround.org',
     url='https://github.com/AnimusPEXUS/wayround_org_toxcorebind',
