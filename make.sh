@@ -1,7 +1,7 @@
 #!/bin/bash
 
-rm wayround_org/toxcorebind/*.so
-rm wayround_org/toxcorebind/*.c
+rm wayround_i2p/toxcorebind/*.so
+rm wayround_i2p/toxcorebind/*.c
 
 reset
 
